@@ -17,30 +17,35 @@ body {
 }
 
 #board {
-  width: 90vmin;
-  height: 90vmin;
-  border: 1px solid red;
+  width: 97.5vmin;
+  height: 97.5vmin;
+  border: 2px solid hsl(0, 0%, 20%);
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  padding: 1px;
 }
 
 #board > div {
   flex-grow: 1;
   display: flex;
-  gap: 1px;
 }
 
 #board > div > div {
-  border: 1px solid green;
   flex-grow: 1;
 }
 
+#board > div:nth-child(odd) > div:nth-child(even).void,
+#board > div:nth-child(even) > div:nth-child(odd).void {
+  background-color: hsl(0, 0%, 95%);
+}
+#board > div:nth-child(odd) > div:nth-child(odd).void,
+#board > div:nth-child(even) > div:nth-child(even).void {
+  background-color: hsl(0, 0%, 90%);
+}
+
 #board .cell.snake {
-  background-color: red;
+  background-color: hsl(0, 0%, 35%);
 }
 
 #board .cell.food {
-  background-color: green;
+  background-color: hsl(198, 91%, 65%);
 }

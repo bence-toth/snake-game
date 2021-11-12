@@ -135,7 +135,7 @@ const init = () => {
   updateBoard();
   gameClock = setInterval(() => {
     moveSnake();
-  }, 100);
+  }, 50);
 };
 
 init();
