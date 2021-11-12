@@ -21,11 +21,15 @@ const renderBoard = () => {
       (row, rowIndex) => `
     <div>
       ${row
-        .map(
-          (column, columnIndex) => `
-          <div class="cell" data-row="${rowIndex}" data-column="${columnIndex}"></div>
-        `
-        )
+        .map((_, columnIndex) => {
+          if (
+            snakeCells.find(([x, y]) => x === columnIndex && y === rowIndex)
+          ) {
+            return `<div class="cell snake" data-row="${rowIndex}" data-column="${columnIndex}"></div>`;
+          } else {
+            return `<div class="cell void" data-row="${rowIndex}" data-column="${columnIndex}"></div>`;
+          }
+        })
         .join("")}
     </div>`
     )
@@ -33,33 +37,12 @@ const renderBoard = () => {
   boardNode.innerHTML = boardHtml;
 };
 
-const updateBoard = () => {
-  board.forEach((row, rowIndex) => {
-    row.forEach((column, columnIndex) => {
-      const cell = boardNode.querySelector(
-        `[data-row="${rowIndex}"][data-column="${columnIndex}"]`
-      );
-      if (snakeCells.find(([x, y]) => x === columnIndex && y === rowIndex)) {
-        cell.classList.add("snake");
-        cell.classList.remove("void");
-        cell.classList.remove("food");
-      } else if (food[0] === columnIndex && food[1] === rowIndex) {
-        cell.classList.add("food");
-        cell.classList.remove("void");
-        cell.classList.remove("snake");
-      } else {
-        cell.classList.add("void");
-        cell.classList.remove("snake");
-        cell.classList.remove("food");
-      }
-    });
-  });
-};
-
 const createFood = () => {
   const voidCells = boardNode.querySelectorAll(".void");
   const randomVoidCell =
     voidCells[Math.floor((voidCells.length - 1) * Math.random())];
+  randomVoidCell.classList.add("food");
+  randomVoidCell.classList.remove("void");
   food = [
     Number(randomVoidCell.dataset.column),
     Number(randomVoidCell.dataset.row),
@@ -82,24 +65,37 @@ const moveSnake = () => {
   if (snakeDirection === "left") {
     nextCell = [headX - 1, headY];
   }
-  if (nextCell[0] === food[0] && nextCell[1] === food[1]) {
-    snakeCells = [nextCell, ...snakeCells];
-    const foodNode = boardNode.querySelector(".cell.food");
-    foodNode.classList.add("snake");
-    foodNode.classList.remove("food");
-    createFood();
-  } else if (
+  if (
     nextCell[0] < 0 ||
     nextCell[0] >= boardDimensions ||
     nextCell[1] < 0 ||
     nextCell[1] >= boardDimensions ||
     snakeCells.find(([x, y]) => x === nextCell[0] && y === nextCell[1])
   ) {
+    // Game over
     clearInterval(gameClock);
+  } else if (nextCell[0] === food[0] && nextCell[1] === food[1]) {
+    // Eat
+    const foodNode = boardNode.querySelector(".cell.food");
+    foodNode.classList.add("snake");
+    foodNode.classList.remove("food");
+    snakeCells = [nextCell, ...snakeCells];
+    createFood();
   } else {
+    // Move snake
+    const newCell = document.querySelector(
+      `.cell[data-column="${nextCell[0]}"][data-row="${nextCell[1]}"]`
+    );
+    newCell.classList.add("snake");
+    newCell.classList.remove("void");
+    const [tailX, tailY] = snakeCells[snakeCells.length - 1];
+    const clearCell = document.querySelector(
+      `.cell[data-column="${tailX}"][data-row="${tailY}"]`
+    );
+    clearCell.classList.remove("snake");
+    clearCell.classList.add("void");
     snakeCells = [nextCell, ...snakeCells.slice(0, -1)];
   }
-  updateBoard();
 };
 
 const registerSnakeDirectionChange = (event) => {
@@ -129,10 +125,8 @@ const registerSnakeDirectionChange = (event) => {
 
 const init = () => {
   renderBoard();
-  document.addEventListener("keydown", registerSnakeDirectionChange);
-  updateBoard();
   createFood();
-  updateBoard();
+  document.addEventListener("keydown", registerSnakeDirectionChange);
   gameClock = setInterval(() => {
     moveSnake();
   }, 50);
