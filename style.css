@@ -64,8 +64,17 @@ body {
   font-size: 6vmin;
   opacity: 1;
   transition: opacity 0.5s;
+  flex-direction: column;
+  gap: 2vmin;
 }
 
 #gameOver.hidden {
   opacity: 0;
+}
+
+#restart {
+  padding: 1vmin;
+  font-family: "Lato", sans-serif;
+  text-transform: uppercase;
+  font-size: 2vmin;
 }

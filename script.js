@@ -75,6 +75,11 @@ const moveSnake = () => {
     // Game over
     clearInterval(gameClock);
     document.getElementById("gameOver").classList.remove("hidden");
+    document.getElementById("restart").tabIndex = 0;
+    document.getElementById("restart").focus();
+    document.getElementById("restart").addEventListener("click", () => {
+      window.location.reload();
+    });
   } else if (nextCell[0] === food[0] && nextCell[1] === food[1]) {
     // Eat
     const foodNode = boardNode.querySelector(".cell.food");
