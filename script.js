@@ -1,5 +1,5 @@
 const boardNode = document.getElementById("board");
-const boardDimensions = 31;
+const boardDimensions = 51;
 
 const board = Array(boardDimensions).fill(Array(boardDimensions).fill(null));
 
