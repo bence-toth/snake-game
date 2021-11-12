@@ -40,3 +40,7 @@ body {
 #board .cell.snake {
   background-color: red;
 }
+
+#board .cell.food {
+  background-color: green;
+}

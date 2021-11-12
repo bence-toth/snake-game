@@ -11,6 +11,9 @@ let snakeCells = [
 
 let snakeDirection = "top";
 let nextSnakeDirection = "top";
+let food = [null, null];
+
+let gameClock;
 
 const renderBoard = () => {
   const boardHtml = board
@@ -20,7 +23,7 @@ const renderBoard = () => {
       ${row
         .map(
           (column, columnIndex) => `
-          <div class="cell void" data-row="${rowIndex}" data-column="${columnIndex}"></div>
+          <div class="cell" data-row="${rowIndex}" data-column="${columnIndex}"></div>
         `
         )
         .join("")}
@@ -39,29 +42,64 @@ const updateBoard = () => {
       if (snakeCells.find(([x, y]) => x === columnIndex && y === rowIndex)) {
         cell.classList.add("snake");
         cell.classList.remove("void");
+        cell.classList.remove("food");
+      } else if (food[0] === columnIndex && food[1] === rowIndex) {
+        cell.classList.add("food");
+        cell.classList.remove("void");
+        cell.classList.remove("snake");
       } else {
         cell.classList.add("void");
         cell.classList.remove("snake");
+        cell.classList.remove("food");
       }
     });
   });
 };
 
+const createFood = () => {
+  const voidCells = boardNode.querySelectorAll(".void");
+  const randomVoidCell =
+    voidCells[Math.floor((voidCells.length - 1) * Math.random())];
+  food = [
+    Number(randomVoidCell.dataset.column),
+    Number(randomVoidCell.dataset.row),
+  ];
+};
+
 const moveSnake = () => {
   snakeDirection = nextSnakeDirection;
   const [headX, headY] = snakeCells[0];
+  let nextCell;
   if (snakeDirection === "top") {
-    snakeCells = [[headX, headY - 1], ...snakeCells.slice(0, -1)];
+    nextCell = [headX, headY - 1];
   }
   if (snakeDirection === "right") {
-    snakeCells = [[headX + 1, headY], ...snakeCells.slice(0, -1)];
+    nextCell = [headX + 1, headY];
   }
   if (snakeDirection === "bottom") {
-    snakeCells = [[headX, headY + 1], ...snakeCells.slice(0, -1)];
+    nextCell = [headX, headY + 1];
   }
   if (snakeDirection === "left") {
-    snakeCells = [[headX - 1, headY], ...snakeCells.slice(0, -1)];
+    nextCell = [headX - 1, headY];
   }
+  if (nextCell[0] === food[0] && nextCell[1] === food[1]) {
+    snakeCells = [nextCell, ...snakeCells];
+    const foodNode = boardNode.querySelector(".cell.food");
+    foodNode.classList.add("snake");
+    foodNode.classList.remove("food");
+    createFood();
+  } else if (
+    nextCell[0] < 0 ||
+    nextCell[0] >= boardDimensions ||
+    nextCell[1] < 0 ||
+    nextCell[1] >= boardDimensions ||
+    snakeCells.find(([x, y]) => x === nextCell[0] && y === nextCell[1])
+  ) {
+    clearInterval(gameClock);
+  } else {
+    snakeCells = [nextCell, ...snakeCells.slice(0, -1)];
+  }
+  updateBoard();
 };
 
 const registerSnakeDirectionChange = (event) => {
@@ -93,9 +131,10 @@ const init = () => {
   renderBoard();
   document.addEventListener("keydown", registerSnakeDirectionChange);
   updateBoard();
-  setInterval(() => {
+  createFood();
+  updateBoard();
+  gameClock = setInterval(() => {
     moveSnake();
-    updateBoard();
   }, 100);
 };
 
