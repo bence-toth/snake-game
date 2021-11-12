@@ -1,20 +1,21 @@
 const boardNode = document.getElementById("board");
+const boardDimensions = 31;
 
-const dimensions = 31;
-const board = Array(dimensions).fill(Array(dimensions).fill(null));
+const board = Array(boardDimensions).fill(Array(boardDimensions).fill(null));
 
 let snakeCells = [
-  [Math.round(dimensions / 2) - 1, Math.round(dimensions / 2) - 1],
-  [Math.round(dimensions / 2) - 1, Math.round(dimensions / 2)],
-  [Math.round(dimensions / 2) - 1, Math.round(dimensions / 2) + 1],
+  [Math.round(boardDimensions / 2) - 1, Math.round(boardDimensions / 2) - 1],
+  [Math.round(boardDimensions / 2) - 1, Math.round(boardDimensions / 2)],
+  [Math.round(boardDimensions / 2) - 1, Math.round(boardDimensions / 2) + 1],
 ];
 
 let snakeDirection = "top";
 let nextSnakeDirection = "top";
 
-const boardHtml = board
-  .map(
-    (row, rowIndex) => `
+const renderBoard = () => {
+  const boardHtml = board
+    .map(
+      (row, rowIndex) => `
     <div>
       ${row
         .map(
@@ -24,10 +25,10 @@ const boardHtml = board
         )
         .join("")}
     </div>`
-  )
-  .join("");
-
-boardNode.innerHTML = boardHtml;
+    )
+    .join("");
+  boardNode.innerHTML = boardHtml;
+};
 
 const updateBoard = () => {
   board.forEach((row, rowIndex) => {
@@ -46,8 +47,6 @@ const updateBoard = () => {
   });
 };
 
-updateBoard();
-
 const moveSnake = () => {
   snakeDirection = nextSnakeDirection;
   const [headX, headY] = snakeCells[0];
@@ -65,7 +64,7 @@ const moveSnake = () => {
   }
 };
 
-document.addEventListener("keydown", (event) => {
+const registerSnakeDirectionChange = (event) => {
   switch (event.key) {
     case "ArrowUp":
       if (snakeDirection !== "bottom") {
@@ -88,9 +87,16 @@ document.addEventListener("keydown", (event) => {
       }
       break;
   }
-});
+};
 
-setInterval(() => {
-  moveSnake();
+const init = () => {
+  renderBoard();
+  document.addEventListener("keydown", registerSnakeDirectionChange);
   updateBoard();
-}, 100);
+  setInterval(() => {
+    moveSnake();
+    updateBoard();
+  }, 100);
+};
+
+init();
