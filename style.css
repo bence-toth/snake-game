@@ -1,0 +1,42 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#board {
+  width: 90vmin;
+  height: 90vmin;
+  border: 1px solid red;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 1px;
+}
+
+#board > div {
+  flex-grow: 1;
+  display: flex;
+  gap: 1px;
+}
+
+#board > div > div {
+  border: 1px solid green;
+  flex-grow: 1;
+}
+
+#board .cell.snake {
+  background-color: red;
+}
